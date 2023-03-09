@@ -5,6 +5,7 @@ import {MainStack} from './MainStack';
 import {AuthStack} from './AuthStack';
 import {useAuth} from '../contexts/Auth';
 import Splash from '../screens/Splash';
+import { StatusBar } from 'react-native';
 
 export const EntryStack = () => {
   const {authData, loading} = useAuth();
@@ -14,6 +15,7 @@ export const EntryStack = () => {
   }
   return (
     <NavigationContainer>
+      <StatusBar backgroundColor={'#fff'} barStyle="dark-content" />
       {authData ? <MainStack /> : <AuthStack />}
     </NavigationContainer>
   );

@@ -7,14 +7,40 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { height, width } from "../utilities/dimensions";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { mailformat, passwordregex } from "../utilities/constants";
 import { useAuth } from "../contexts/Auth";
+import { dummySignInApi } from "../services/service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
-export default function Login({ navigation }) {
+export default function Login({ navigation }: any) {
+  const [alldata, setAlldata] = useState([]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getData()
+    }, [])
+  );
+
+
+
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("@all_users");
+      const mydata = jsonValue != null ? JSON.parse(jsonValue) : null;
+      if (mydata != null) {
+        setAlldata(mydata);
+      }
+    } catch (e) {
+      // error reading value
+      console.log("Error in getting all user's data", e);
+    }
+  };
+
   const auth = useAuth();
   const [email, setEmail] = useState({
     value: "",
@@ -36,18 +62,28 @@ export default function Login({ navigation }) {
       setPassword({ value: value, error: false });
     }
   };
- 
+
   const onSubmit = async () => {
     if (email.value.length == 0 || password.value.length == 0) {
       return Alert.alert("", "Please enter all fields");
     } else if (email.error || password.error) {
       Alert.alert("", "Please enter all fields");
     } else {
-      Alert.alert("", "Logged in");
       const data = {
-        "email": email.value,
-      }
-       auth.signIn(data)
+        email: email.value.toLowerCase(),
+        password: password.value,
+      };
+
+      dummySignInApi(data, alldata).then((res) => {
+        if (res?.code === 200) {
+          Alert.alert("", res?.message);
+          console.log("userdata", res?.data[0]);
+          auth.signIn(res?.data);
+        } else {
+          Alert.alert("", res?.message);
+          
+        }
+      });
     }
   };
 
@@ -75,6 +111,7 @@ export default function Login({ navigation }) {
       />
 
       <CustomButton title="Log in" onPress={() => onSubmit()} />
+
       <Pressable onPress={() => navigation.navigate("signup")}>
         <Text style={{ fontSize: 16 }}>
           Don't have an account?{" "}

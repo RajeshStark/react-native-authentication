@@ -8,13 +8,38 @@ import {
   Image,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { height, width } from "../utilities/dimensions";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { mailformat, passwordregex } from "../utilities/constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Signup({ navigation }) {
+type itype = {
+  username: string;
+  email: string;
+  token: string;
+};
+export default function Signup({ navigation }: any) {
+  const [alldata, setAlldata] = useState([]);
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("@all_users");
+      const mydata = jsonValue != null ? JSON.parse(jsonValue) : null;
+      if(mydata != null){
+        setAlldata(mydata);
+      }
+    } catch (e) {
+      // error reading value
+      console.log("Error in getting all user's datanfrom signup page", e);
+    }
+  };
+
   const [username, setUsername] = useState({
     value: "",
     error: false,
@@ -46,14 +71,54 @@ export default function Signup({ navigation }) {
   };
 
   const onSubmit = () => {
-    if(username.value.length == 0 || email.value.length == 0 || password.value.length == 0) {
-        return Alert.alert("", "Please enter all fields");
+    const data = alldata;
+    let flag = false;
+    console.log({data});
+    
+    if (
+      username.value.length == 0 ||
+      email.value.length == 0 ||
+      password.value.length == 0
+    ) {
+      return Alert.alert("", "Please enter all fields");
     } else if (username.error || email.error || password.error) {
       Alert.alert("", "Please enter all fields");
+    } else if (data == null) {
+      data.push({
+        username: username.value,
+        email: email.value,
+        password: password.value,
+      });
+
+      storeData(data);
     } else {
-      Alert.alert("", "signed up");
+      data.forEach((i) => {
+        if (i.email == email.value) {
+          flag = true;
+        }
+      });
+      if (flag) return Alert.alert("", "email already exists");
+      data.push({
+        username: username.value,
+        email: email.value,
+        password: password.value,
+      });
+
+      storeData(data);
     }
   };
+
+  const storeData = async (value: object) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("@all_users", jsonValue);
+      Alert.alert("", "signed up successfully, please login");
+    } catch (e) {
+      // saving error
+      console.log(e, "Error saving users data");
+    }
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>

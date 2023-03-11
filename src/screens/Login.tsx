@@ -17,6 +17,10 @@ import { dummySignInApi } from "../services/service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 
+type props = {
+  email: string;
+  password: string;
+}
 export default function Login({ navigation }: any) {
   const [alldata, setAlldata] = useState([]);
 
@@ -69,7 +73,7 @@ export default function Login({ navigation }: any) {
     } else if (email.error || password.error) {
       Alert.alert("", "Please enter all fields");
     } else {
-      const data = {
+      const data : props = {
         email: email.value.toLowerCase(),
         password: password.value,
       };
@@ -92,6 +96,7 @@ export default function Login({ navigation }: any) {
       <Text style={{ fontSize: 24, fontWeight: "700", color: "blue" }}>
         MY APP LOGIN{" "}
       </Text>
+      <Text>{JSON.stringify(email.value)}</Text>
       <CustomInput
         value={email.value}
         placeholder="Please enter your e-mail"

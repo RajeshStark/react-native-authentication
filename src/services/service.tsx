@@ -1,4 +1,11 @@
-export const dummySignInApi = async (data: object, alldata: any) => {
+
+type itype = {
+  email: string;
+  password: string;
+};
+
+export const dummySignInApi = async (data: itype, alldata: any) => {
+ 
   if (alldata == null || alldata.length == 0 || (await check(alldata, data))) {
     const response = {
       code: 404,
@@ -7,8 +14,9 @@ export const dummySignInApi = async (data: object, alldata: any) => {
     };
     return response;
   } else {
-    const userdata = alldata.filter((i) => i.email == data.email);
-
+    const userdata = alldata.filter((i : itype) => i.email == data.email);
+    console.log({userdata});
+    
     if (userdata[0].password == data.password) {
       const response = {
         code: 200,
@@ -30,7 +38,7 @@ export const dummySignInApi = async (data: object, alldata: any) => {
 const check = async (res: any, data: any) => {
   let flag = false;
 
-  await res.forEach((i) => {
+  await res.forEach((i : itype) => {
     if (i.email == data.value) {
       flag = true;
     }

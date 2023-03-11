@@ -7,7 +7,7 @@ import { height, width } from '../utilities/dimensions';
 
 
 export default function Home() {
-const [userdata, setuserdata] = useState([])
+const [userdata, setuserdata] = useState<any>()
   const auth = useAuth();
 
   useEffect(() => {

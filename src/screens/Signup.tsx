@@ -18,10 +18,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 type itype = {
   username: string;
   email: string;
-  token: string;
+  password: string;
 };
+
+
 export default function Signup({ navigation }: any) {
-  const [alldata, setAlldata] = useState([]);
+  const [alldata, setAlldata] = useState<any[]>([]);
 
   useEffect(() => {
     getData();
@@ -71,7 +73,7 @@ export default function Signup({ navigation }: any) {
   };
 
   const onSubmit = () => {
-    const data = alldata;
+    const data : any = alldata;
     let flag = false;
     console.log({data});
     
@@ -86,13 +88,13 @@ export default function Signup({ navigation }: any) {
     } else if (data == null) {
       data.push({
         username: username.value,
-        email: email.value,
+        email: email.value.toLowerCase(),
         password: password.value,
       });
 
       storeData(data);
     } else {
-      data.forEach((i) => {
+      data.forEach((i : itype) => {
         if (i.email == email.value) {
           flag = true;
         }
@@ -144,7 +146,7 @@ export default function Signup({ navigation }: any) {
           placeholder="Please enter your username"
           onChangeText={(txt) => onChange("username", txt)}
           error={username.error}
-          errortxt={"Please enter username atleast 6 letters"}
+          errortxt={"Please create your username atleast 6 letters"}
         />
 
         <CustomInput
@@ -161,7 +163,7 @@ export default function Signup({ navigation }: any) {
           onChangeText={(txt) => onChange("password", txt)}
           error={password.error}
           errortxt={
-            "Please atleast one special charecter, atleast one uppercase letter, lower case letter and number"
+            "Please atleast one special charecter, atleast one uppercase letter, lower case letter and number and atleast 8 digits"
           }
         />
 

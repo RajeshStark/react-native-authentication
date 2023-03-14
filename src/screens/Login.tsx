@@ -111,7 +111,7 @@ export default function Login({ navigation }: any) {
         onChangeText={(txt) => onChange("password", txt)}
         error={password.error}
         errortxt={
-          "Please atleast one special charecter, atleast one uppercase letter, lower case letter and number"
+          "Please enter atleast one special charecter, atleast one uppercase letter, lower case letter and number"
         }
       />
 
